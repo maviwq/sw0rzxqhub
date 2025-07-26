@@ -58,8 +58,8 @@ progressBarBackgroundCorner.CornerRadius = UDim.new(0, 5)
 progressBarBackgroundCorner.Parent = progressBarBackground
 
 --- ANİMASYONLU MESAJ SİSTEMİ ---
-local function showMessage(text)
-    local color = Color3.fromRGB(40, 40, 40) -- Koyu gri arkaplan
+local function showMessage(text, isCommand)
+    local color = isCommand and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(40, 40, 40) -- Komutlarda yeşil, diğerlerinde koyu gri
     
     local messageGui = Instance.new("ScreenGui")
     messageGui.Name = "MessageGui"
@@ -110,54 +110,9 @@ local function showMessage(text)
     end)
 end
 
---- HOŞGELDİN MESAJI ---
+--- HOŞGELDİN MESAJI (SOL KENARDA MESAJ OLARAK) ---
 local function showWelcomeMessage()
-    local welcomeGui = Instance.new("ScreenGui")
-    welcomeGui.Name = "WelcomeGui"
-    welcomeGui.Parent = player.PlayerGui
-
-    local welcomeFrame = Instance.new("Frame")
-    welcomeFrame.Size = UDim2.new(0, 0, 0, 60)
-    welcomeFrame.Position = UDim2.new(0.5, 0, 0.5, -30)
-    welcomeFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    welcomeFrame.BackgroundTransparency = 1
-    welcomeFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    welcomeFrame.Parent = welcomeGui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = welcomeFrame
-
-    local welcomeText = Instance.new("TextLabel")
-    welcomeText.Size = UDim2.new(1, 0, 1, 0)
-    welcomeText.Position = UDim2.new(0, 0, 0, 0)
-    welcomeText.Text = "Hoşgeldiniz!"
-    welcomeText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    welcomeText.Font = Enum.Font.GothamBold
-    welcomeText.TextSize = 24
-    welcomeText.BackgroundTransparency = 1
-    welcomeText.Parent = welcomeFrame
-
-    -- Giriş animasyonu
-    local fadeIn = tweenService:Create(
-        welcomeFrame,
-        TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-        {BackgroundTransparency = 0.3}
-    )
-    fadeIn:Play()
-
-    -- 2 saniye bekleyip çıkış animasyonu
-    delay(2, function()
-        local fadeOut = tweenService:Create(
-            welcomeFrame,
-            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {BackgroundTransparency = 1}
-        )
-        fadeOut:Play()
-        fadeOut.Completed:Connect(function()
-            welcomeGui:Destroy()
-        end)
-    end)
+    showMessage("Hoşgeldiniz!", false) -- Normal mesaj olarak göster (koyu gri arkaplan)
 end
 
 --- ANA ARAYÜZ ---
@@ -415,19 +370,19 @@ local function teleportToPlayer(targetName)
     local success, errorMsg = pcall(function()
         local target = findPlayer(targetName)
         if not target then
-            showMessage("Oyuncu bulunamadı")
+            showMessage("Oyuncu bulunamadı", false)
             return false
         end
         
         local targetChar = target.Character
         if not targetChar then
-            showMessage("Karakter yüklü değil")
+            showMessage("Karakter yüklü değil", false)
             return false
         end
         
         local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
         if not targetRoot then
-            showMessage("Hedef rootpart yok")
+            showMessage("Hedef rootpart yok", false)
             return false
         end
         
@@ -438,12 +393,12 @@ local function teleportToPlayer(targetName)
             humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
         end)
         
-        showMessage("Işınlanma Gerçekleşti")
+        showMessage("Işınlanma Gerçekleşti", true) -- Komut mesajı (yeşil)
         return true
     end)
     
     if not success then
-        showMessage("Işınlanma Hatası")
+        showMessage("Işınlanma Hatası", false)
         warn("Işınlanma Hatası:", errorMsg)
         return false
     end
@@ -574,7 +529,7 @@ local function enableFly()
     humanoid.PlatformStand = true
     runService.Heartbeat:Connect(updateFly)
     
-    showMessage("Fly aktif")
+    showMessage("Fly aktif", true) -- Komut mesajı (yeşil)
 end
 
 local function disableFly()
@@ -591,7 +546,7 @@ local function disableFly()
     if bodyVelocity then bodyVelocity:Destroy() end
     humanoid.PlatformStand = false
     
-    showMessage("Fly deaktif")
+    showMessage("Fly deaktif", true) -- Komut mesajı (yeşil)
 end
 
 --- ANİMASYON FONKSİYONLARI ---
